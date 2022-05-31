@@ -44,24 +44,25 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.get('/', (req, res) => {
-    // res.render("pages/home");
-    res.render("pages/classes");
+    var array = classes.find({teacher:req.user._id});
+    console.log(array.length);
+    res.render("pages/classes", {array});
 });
 
 app.use('/user', userRoutes);
 
 app.get('/:classid', (req, res) => {
     const classid = req.params.classid;
-    const thisClass = classes.find({ _id: classid });
+    const thisClass = classes.find({id: classid });
     res.render("pages/class", { thisClass });
 });
 
 app.post('/newclass', async (req, res) => {
     console.log(req.body);
-    const newclass = await new classes({ subject: req.body.subject, standard: req.body.standard });
+    const newclass = await new classes({teacher:req.user._id, subject: req.body.subject, standard: req.body.standard });
     await newclass.save();
 
-    res.redirect(`${newclass._id}`);
+    res.redirect(`/${newclass._id}`);
 });
 
 app.listen(3000, () => {
